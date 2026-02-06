@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "dotenv": "^17.2.4",
+    "express": "^5.2.1",
     "mongodb": "^7.1.0",
     "mongoose": "^9.1.6"
   },
@@ -9,10 +10,9 @@
   "type": "module",
   "description": "web-based digital broker",
   "main": "server.js",
-  "devDependencies": {},
   "scripts": {
-"start": "node server.js",
-"dev": "nodemon server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "repository": {
     "type": "git",
