@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "dotenv": "^17.2.4",
+    "mongodb": "^7.1.0",
+    "mongoose": "^9.1.6"
+  },
+  "name": "final_year_project",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "web-based digital broker",
+  "main": "server.js",
+  "devDependencies": {},
+  "scripts": {
+"start": "node server.js",
+"dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/netsanetabuhay/FINAL_YEAR_PROJECT.git"
+  },
+  "author": "Netsanet",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/netsanetabuhay/FINAL_YEAR_PROJECT/issues"
+  },
+  "homepage": "https://github.com/netsanetabuhay/FINAL_YEAR_PROJECT#readme"
+}
