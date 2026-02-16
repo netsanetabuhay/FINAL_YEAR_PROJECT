@@ -1,5 +1,4 @@
-// controllers/authController.js
-import User from '../models/User.js';
+import User from '../Models/User.js';
 import jwt from 'jsonwebtoken';
 
 // Generate JWT Token
@@ -9,8 +8,7 @@ const generateToken = (id) => {
   });
 };
 
-// @desc    Register user
-// @route   POST /api/auth/register
+
 export const registerUser = async (req, res) => {
   try {
     const { fullName, email, phone, password, role, providerDetails, tenantDetails } = req.body;
@@ -24,7 +22,7 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    // Create user data
+    // Create user based on role
     const userData = {
       fullName,
       email,
@@ -34,10 +32,10 @@ export const registerUser = async (req, res) => {
     };
 
     // Add role-specific details
-    if (role === 'provider' && providerDetails) {
-      userData.providerDetails = providerDetails;
-    } else if (role === 'tenant' && tenantDetails) {
-      userData.tenantDetails = tenantDetails;
+    if (role === 'provider') {
+      userData.providerDetails = providerDetails || {};
+    } else if (role === 'tenant') {
+      userData.tenantDetails = tenantDetails || {};
     }
 
     const user = await User.create(userData);
@@ -55,9 +53,7 @@ export const registerUser = async (req, res) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
-        status: user.status,
-        providerDetails: user.providerDetails,
-        tenantDetails: user.tenantDetails
+        status: user.status
       }
     });
 
@@ -71,8 +67,6 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// @desc    Login user
-// @route   POST /api/auth/login
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -95,7 +89,7 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    // Check if user is active
+    // Check if user is active (using auth middleware later)
     if (user.status !== 'active') {
       return res.status(403).json({
         success: false,
@@ -116,14 +110,94 @@ export const loginUser = async (req, res) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
-        status: user.status,
-        providerDetails: user.providerDetails,
-        tenantDetails: user.tenantDetails
+        status: user.status
       }
     });
 
   } catch (error) {
     console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+// @desc    Get user profile
+// @route   GET /api/users/profile
+export const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    
+    res.json({
+      success: true,
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        status: user.status,
+        ...(user.role === 'provider' && { providerDetails: user.providerDetails }),
+        ...(user.role === 'tenant' && { tenantDetails: user.tenantDetails })
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+
+export const getProviderDashboard = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    
+    res.json({
+      success: true,
+      message: 'Welcome to provider dashboard',
+      dashboard: {
+        user: {
+          _id: user._id,
+          fullName: user.fullName,
+          role: user.role,
+          businessName: user.providerDetails?.businessName,
+          serviceAreas: user.providerDetails?.serviceAreas
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+};
+
+
+export const getTenantDashboard = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    
+    res.json({
+      success: true,
+      message: 'Welcome to tenant dashboard',
+      dashboard: {
+        user: {
+          _id: user._id,
+          fullName: user.fullName,
+          role: user.role,
+          preferredLocations: user.tenantDetails?.preferredLocations,
+          maxBudget: user.tenantDetails?.maxBudget
+        }
+      }
+    });
+  } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Server error',
