@@ -5,7 +5,9 @@ import {
   getUserProfile,
   updateUserProfile,
   logoutUser,
-  getUsers
+  getUsers,
+  deleteUser,
+  getUserById
 } from '../controllers/userController.js';
 import { protect, admin } from '../middleware/auth.js';
 
@@ -16,12 +18,14 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/logout', logoutUser);
 
-// Protected routes
+// Protected routes (any logged in user)
 router.route('/profile')
   .get(protect, getUserProfile)
   .put(protect, updateUserProfile);
 
-// Admin routes
+// Admin only routes
 router.get('/users', protect, admin, getUsers);
+router.get('/users/:id', protect, admin, getUserById);
+router.delete('/users/:id', protect, admin, deleteUser);
 
 export default router;
