@@ -11,14 +11,9 @@ const userSchema = new mongoose.Schema({
   updated_at: { type: Date, default: Date.now }
 });
 
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password_hash')) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password_hash = await bcrypt.hash(this.password_hash, salt);
-  this.updated_at = Date.now();
-  next();
-});
+// NO MIDDLEWARE AT ALL - Completely removed
 
+// Compare password method
 userSchema.methods.comparePassword = async function(password) {
   return await bcrypt.compare(password, this.password_hash);
 };
