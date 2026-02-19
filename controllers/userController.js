@@ -1,10 +1,8 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import env from '../utils/env.js';
+import generateToken from '../utils/tokenGenerator.js'
 
-const generateToken = (id) => {
-  return jwt.sign({ id }, env.jwtSecret, { expiresIn: env.jwtExpire });
-};
 
 export const registerUser = async (req, res) => {
   try {
@@ -12,16 +10,11 @@ export const registerUser = async (req, res) => {
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: 'User already exists' });
 
-    const user = await User.create({
-      name, email, phone,
-      password_hash: password,
-      roles: ['user']
-    });
+ const user = await User.create({name, email, phone, password_hash: password,roles: ['user']  });
 
     res.status(201).json({
-      _id: user._id, name: user.name, email: user.email,
-      phone: user.phone, roles: user.roles,
-      token: generateToken(user._id)
+     message: "registerd successfuly", user
+      
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -35,12 +28,14 @@ export const loginUser = async (req, res) => {
     if (!user) return res.status(401).json({ message: 'Invalid email or password' });
 
     const isPasswordMatch = await user.comparePassword(password);
-    if (!isPasswordMatch) return res.status(401).json({ message: 'Invalid email or password' });
+    if (!isPasswordMatch) return res.status(401).json({ message: 'please enter correct password' });
+     
+    const   token = generateToken(user._id);
 
-    res.json({
-      _id: user._id, name: user.name, email: user.email,
+    res.json({ message: "login successfuly",
+      id: user._id, name: user.name, email: user.email,
       phone: user.phone, roles: user.roles,
-      token: generateToken(user._id)
+    
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
