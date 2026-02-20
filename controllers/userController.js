@@ -7,13 +7,24 @@ import generateToken from '../utils/tokenGenerator.js'
 export const registerUser = async (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
+    
+    // Check for incomplete data
+    if (!name || !email || !phone || !password) {
+      return res.status(400).json({ 
+        message: 'Registration failed: Please fill in all required fields (name, email, phone, and password)' 
+      });
+    }
+    
     const userExists = await User.findOne({ email });
-    if (userExists) return res.status(400).json({ message: 'User already exists' });
+    if (userExists) return res.status(400).json({ 
+      message: 'Registration failed: A user with this email already exists. Please use a different email or try logging in.' 
+    });
 
- const user = await User.create({name, email, phone, password_hash: password,roles: ['user']  });
+    const user = await User.create({name, email, phone, password_hash: password,roles: ['user']  });
 
     res.status(201).json({
-     message: "registerd successfuly", user
+      message: "Congratulations! You have successfully registered. Welcome aboard!", 
+      user
       
     });
   } catch (error) {
@@ -24,15 +35,28 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+    
+    // Check for incomplete data
+    if (!email || !password) {
+      return res.status(400).json({ 
+        message: 'Login failed: Please enter both email and password to continue.' 
+      });
+    }
+    
     const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ message: 'Invalid email or password' });
+    if (!user) return res.status(401).json({ 
+      message: 'Login failed: We couldn\'t find an account with this email address. Please check your email or register for a new account.' 
+    });
 
     const isPasswordMatch = await user.comparePassword(password);
-    if (!isPasswordMatch) return res.status(401).json({ message: 'please enter correct password' });
+    if (!isPasswordMatch) return res.status(401).json({ 
+      message: 'Login failed: The password you entered is incorrect. Please try again or click "Forgot Password" to reset it.' 
+    });
      
-    const   token = generateToken(user._id);
+    const token = generateToken(user._id);
 
-    res.json({ message: "login successfuly",
+    res.json({ 
+      message: "Great to see you again! You have successfully logged in.",
       id: user._id, name: user.name, email: user.email,
       phone: user.phone, roles: user.roles,
     
@@ -71,7 +95,7 @@ export const updateUserProfile = async (req, res) => {
 };
 
 export const logoutUser = async (req, res) => {
-  res.json({ message: 'Logged out successfully' });
+  res.json({ message: 'You have been successfully logged out. See you again soon!' });
 };
 
 export const getUsers = async (req, res) => {
