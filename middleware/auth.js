@@ -50,3 +50,23 @@ export const admin = (req, res, next) => {
     return res.status(403).json({ message: 'Not authorized as admin' });
   }
 };
+
+// New authorize function for multiple roles
+export const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+    
+    // Check if user has any of the allowed roles
+    const hasRole = req.user.roles.some(role => roles.includes(role));
+    
+    if (hasRole) {
+      next();
+    } else {
+      return res.status(403).json({ 
+        message: `Not authorized. Required roles: ${roles.join(', ')}` 
+      });
+    }
+  };
+};

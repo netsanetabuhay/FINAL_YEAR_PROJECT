@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import connectDB from './config/database.js';
 import userRoutes from './routes/userRoutes.js';
+import carRoutes from './routes/carRoutes.js';
 import env from './utils/env.js';
 
 dotenv.config();
@@ -20,6 +21,7 @@ app.use(cors({
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/cars', carRoutes); 
 app.get('/', (req, res) => res.send('API is running...'));
 
 // Only start server after database connects
