@@ -35,6 +35,12 @@ const userSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
+
+    profile_image: {
+    type: String,
+    default: null
+  },
+  
   roles: { 
     type: [String], 
     default: ['tenant'] 

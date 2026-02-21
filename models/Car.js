@@ -43,10 +43,10 @@ const carSchema = new mongoose.Schema({
     min: 0
   },
   
-  images: [{
-    type: String,
-    required:'true'
-  }],
+  images: {
+    type: [String],
+    default: null
+  },
   
   location: {
     address: {
